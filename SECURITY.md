@@ -1,24 +1,21 @@
 # Security policy
 
+## Supported versions
+
+`lint` is currently pre-release. Security fixes are applied to the latest code on `main`; no released
+version has a separate support commitment yet.
+
 ## Reporting a vulnerability
 
-Report privately through GitHub's private vulnerability reporting for brunmmartins/lint, once the
-maintainer has created the repository and enabled it in the security settings. Until then, contact the
-maintainer privately through GitHub. Never report a vulnerability in a public issue.
+Use GitHub's private vulnerability reporting for `brunmmartins/lint`. If private reporting is not
+available, contact the maintainer privately through GitHub.
 
-Do not describe an unfixed vulnerability in a public issue, a branch name, or a commit message. Those are
-replicated widely and kept indefinitely (S §7.5).
+Do not report an unfixed vulnerability in a public issue, branch name, commit message, or review comment.
+Include the affected version or commit, reproduction steps, impact, and any suggested mitigation in the
+private report.
 
-## Handling
+The maintainer triages reports and will coordinate disclosure after a fix is available. No fixed response
+or remediation time is currently promised.
 
-| | |
-|---|---|
-| Triage owner | The maintainer |
-| Acknowledgement and remediation service levels | None promised: a local tool with no users beyond the maintainer (brief §15) |
-| Supported versions | None released yet |
-
-- Security findings go on the board with restricted access. Exploit details stay out of public card
-  fields (K §22.3).
-- Expedite handling applies only when the expedite criteria in [docs/workflow-policy.md](docs/workflow-policy.md)
-  are met. A scanner score alone does not qualify (K §7.3, §16.4).
-- A committed secret is rotated first. Removing it from history does not make it safe again (S §7.20).
+If a secret is committed, rotate it immediately. Removing it from Git history does not make the exposed
+secret safe again.

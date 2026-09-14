@@ -1,53 +1,72 @@
 # lint
 
-A person writing Markdown, or a CI job, runs one command over files or directories and gets every style
-problem reported with its location and rule, and can fix the safe ones automatically.
+`lint` is a small Rust command-line tool for checking Markdown files. It accepts files and directories,
+walks directories recursively, and reports each problem with its path, line, column, rule, and message.
 
-- **Status:** Pre-release. Scaffolded on 2026-09-14; the first slice, LINT-001, is in progress. There is no
-  versioned release.
-- **Stack profile:** `cli` (the decision record is not yet written; ADR-0001, LINT-001)
-- **Support:** GitHub issues on brunmmartins/lint, once the maintainer creates the repository
-- **Security reports:** [SECURITY.md](SECURITY.md)
+The project is pre-release. It currently checks:
 
-## What this is, and what it is not
+| Rule | Check |
+|---|---|
+| `MD009` | Trailing spaces and tabs |
+| `MD047` | Files end with exactly one newline |
 
-The [application brief](docs/application-brief.md) holds the outcome, the non-goals, who it is for, and
-where it is delivered. It describes what is true now, so edit it when an answer changes.
+## Build
 
-## Quick start
+Install [Rust](https://www.rust-lang.org/tools/install), then build the workspace:
 
-Prerequisites and the first-run path are in [docs/local-development.md](docs/local-development.md).
+```bash
+rustup toolchain install --no-self-update
+cargo build --locked -p lint
+```
+
+The optimized binary can be built with `cargo build --release --locked -p lint`.
+
+## Usage
+
+Pass one or more Markdown files or directories:
+
+```bash
+cargo run -p lint -- README.md path/to/markdown
+```
+
+Directories are searched recursively for files whose extension is `.md` or `.markdown`, without
+following directory symlinks. An explicitly named file is checked regardless of its extension.
+
+Findings are written to standard output in this form:
+
+```text
+path/to/file.md:4:12 MD009 trailing whitespace
+```
+
+The process exits with status `0` when no findings remain, `1` when findings are present, and `2` for
+invalid arguments or file-system errors.
+
+## Development
+
+[`just`](https://github.com/casey/just) provides the standard development commands:
 
 ```bash
 just bootstrap
 just check-fast
+just check
 ```
 
-If `just` is not installed, [CONTRIBUTING.md](CONTRIBUTING.md#commands) lists the commands behind each recipe.
+The equivalent Cargo commands and contribution workflow are documented in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Use
+## Project structure
 
-Not usable yet; the first delivering slice is LINT-001 (brief §5).
-
-## Repository map
-
-| Path | Holds |
+| Path | Purpose |
 |---|---|
-| [`docs/application-brief.md`](docs/application-brief.md) | What is built, for whom, where it is delivered, under what constraints |
-| [`docs/architecture.md`](docs/architecture.md) | Boundaries, crates, and composition roots as they are now |
-| [`docs/adr/`](docs/adr/README.md) | Decisions: what was chosen, what was rejected, and why |
-| [`docs/workflow-policy.md`](docs/workflow-policy.md) | Commitment and delivery points, Definition of Ready, Definition of Done |
-| [`work-items/`](work-items/README.md) | One evidence record per board card |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Commands, branches, commits, and review |
-| [`docs/git-workflow.md`](docs/git-workflow.md) | Branching, integration, signing, and recovery policy |
+| `apps/lint/` | CLI, file-system adapters, and end-to-end tests |
+| `crates/application/` | Lint orchestration, output formatting, and exit-code policy |
+| `crates/domain/` | Markdown model and lint rules |
 
-## Citations
+## Security
 
-References like **K §5.2**, **S §16.1**, and **P §10** point to the method handbooks this project was
-scaffolded under:
+Please report vulnerabilities as described in [SECURITY.md](SECURITY.md).
 
-- **K**: `RUST_KANBAN_GOOD_PRACTICES.md`, which sets flow and engineering policy.
-- **S**: `RUST_LOCAL_DEVELOPMENT_TECH_STACK.md`, one stack that conforms to K.
-- **P**: `RUST_APPLICATION_PREREQUISITES.md`, the template the brief was filled from.
+## License
 
-**Brief §N** means section N of [`docs/application-brief.md`](docs/application-brief.md).
+Licensed under either the [Apache License 2.0](LICENSE-APACHE) or the [MIT License](LICENSE-MIT), at your
+option.

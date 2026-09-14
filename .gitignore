@@ -1,6 +1,18 @@
 # Rust build output
 /target/
 
+# Local project planning, agent tooling, and generated delivery state
+/.agents/
+/.claude/
+/.codex/
+/.delivery/
+/.worktrees/
+/docs/
+/work-items/
+/AGENTS.md
+/CLAUDE.md
+/CHANGELOG.md
+
 # Cargo.lock is committed for binaries and applications (K §10.3, S §19.2). Uncomment only if brief §18
 # records a library that does not commit it.
 # Cargo.lock
@@ -23,9 +35,6 @@ flamegraph.svg
 
 # Tool output
 /.cache/
-
-# Personal agent settings. The shared .claude/ and .codex/ configuration is committed with the code.
-.claude/settings.local.json
 
 # Operating-system metadata
 .DS_Store

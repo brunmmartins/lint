@@ -21,7 +21,7 @@ bootstrap:
     set -euo pipefail
     for tool in git rustup cargo; do
         if ! command -v "$tool" >/dev/null 2>&1; then
-            echo "MISSING  $tool (required; see docs/local-development.md)" >&2
+            echo "MISSING  $tool (required; see CONTRIBUTING.md)" >&2
             exit 1
         fi
         echo "ok       $tool"
