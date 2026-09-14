@@ -1,0 +1,16 @@
+* text=auto
+
+*.rs       text eol=lf
+*.toml     text eol=lf
+*.lock     text eol=lf
+*.md       text eol=lf
+*.json     text eol=lf
+*.sh       text eol=lf
+justfile   text eol=lf
+
+# Add a type only when the project uses it, in a change of its own (S §7.15). For example:
+# *.sql      text eol=lf       persistence profile
+# *.yaml     text eol=lf       Compose, contracts, CI
+# *.yml      text eol=lf
+# *.png      binary
+# contracts/generated/** linguist-generated=true

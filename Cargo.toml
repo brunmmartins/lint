@@ -1,0 +1,44 @@
+# Workspace manifest for lint (S §6.2, §23.1).
+#
+# List every crate in `members` explicitly, and only once it exists. A crate missing from the list is
+# silently left out of every `--workspace` command, including the quality gate. A glob such as
+# "crates/*" is not a shortcut: Cargo rejects a glob that matches no directory.
+#
+# Until the first crate is added, Cargo stops with "the workspace has no members". That is expected
+# straight after the template is copied.
+
+[workspace]
+members = []
+# Set explicitly: a virtual manifest does not take its resolver from the edition.
+resolver = "3"
+
+# Members opt in with `edition.workspace = true`, `license.workspace = true`, and
+# `publish.workspace = true`. A member that omits a key does not inherit it.
+[workspace.package]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+# Set `publish = true` on a member only when brief §7 says that crate is published.
+publish = false
+# rust-version = "x.y"   # Only if brief §18 promises an MSRV, and only with a CI job that builds with it (K §10.1).
+
+# One version per dependency. Members use it with `name.workspace = true` (S §19.1). The template pins
+# nothing: add each dependency with a reviewed, current version when the first crate needs it (S §23).
+[workspace.dependencies]
+
+# Members opt in with `[lints] workspace = true`. A member without that section gets no lint policy.
+# Lint levels are a starting policy (S §23.1): keep only what the team will maintain. Warnings are
+# denied on the command line, never with `#![deny(warnings)]` (K §12.1).
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unused_must_use = "deny"
+
+[workspace.lints.clippy]
+dbg_macro = "deny"
+todo = "warn"
+unwrap_used = "warn"
+
+# Build profiles go below. Measure with `cargo build --timings` before adding anything (S §6.5).
+# Settings that change codegen change what is tested, so keep them here rather than in personal config.
+#
+# [profile.release]
+# overflow-checks = ...   # Open choice (P §20). Decide before the first release build; record it in brief §18.

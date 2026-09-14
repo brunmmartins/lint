@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "system": "rust-delivery",
+  "version": "1.2.0",
+  "source": "../../reference/good-practices/templates",
+  "tools": [
+    "claude",
+    "codex"
+  ],
+  "files": {
+    ".agents/skills/rust-adr/SKILL.md": "236c98f41523ce7bbb712afdbd609c7ceb5e137f7760ce05399759b4553c6b96",
+    ".agents/skills/rust-code-review/SKILL.md": "d90507b7fe154e468af130d8ea25693ff3d9410867c2da39c3079b721fe14500",
+    ".agents/skills/rust-deliver/SKILL.md": "5dc40c9325953b6eac4180778bd64f5291fe493efef8c250c513094ce0633c14",
+    ".agents/skills/rust-flow-intake/SKILL.md": "407e81228afe008ec989ffc19a60adab2e0402bf932a522611b96c9aaf538985",
+    ".agents/skills/rust-git-workflow/SKILL.md": "3b260e9f2c6c709dc71aabed54e2dbc6df38fd7bb56316b2f54450f94b89ba0b",
+    ".agents/skills/rust-implementation/SKILL.md": "9e5d7b28f708db3e935b65298c2281365a0813d95591f102c8547c2e6a18b9d8",
+    ".agents/skills/rust-interruption-recovery/SKILL.md": "4c23cfb72ae7071643e33c87842b54d283e88d8365b7b58f932ea5d420b508e7",
+    ".agents/skills/rust-release-readiness/SKILL.md": "17ea691509d0bb05113e4be07efd6d63f10b3e46a4c05e64db6d30c10c89ad14",
+    ".agents/skills/rust-solution-architecture/SKILL.md": "0ee6b1e74e6f94ec329ff59e962bc4cb7dc203d5809168a8530e6b3c22f519e8",
+    ".agents/skills/rust-solution-architecture/references/architecture-contract.md": "9f32fdf295870bb084083ded4c5f7b96bceed71da3ecb0f65828b1eeb52ad0bb",
+    ".agents/skills/rust-supply-chain-security/SKILL.md": "2807fc3b0fdd9ff7b4753b1934af67db0d36adbfff12f76d7e7edf5c52c4ac71",
+    ".agents/skills/rust-testing-strategy/SKILL.md": "90ec5ac929738c44259169ab9a14895ae4b64c0b89f41a06fee97b5b51e1de14",
+    ".agents/skills/rust-validation/SKILL.md": "fd6c2eb4de3edcbe1b6484f58791f4b9dc81ab9f47a61aa3090032330920cd0f",
+    ".agents/skills/rust-work-item-traceability/SKILL.md": "2f53d92c314d0b8c1a753d4c7f1876b22a092a0ac21d7f0c13939e6bb8b8e22d",
+    ".claude/agents/rust-implementer.md": "8547844832bc5470c5311abe5392a516864e6e31bd3014e21a1c041bf0afb409",
+    ".claude/agents/rust-intake-planner.md": "ecc39507695c89b55d2e77d18e46a2c9e2034b4a624282934551b15b2ae972ef",
+    ".claude/agents/rust-quality-reviewer.md": "4e44df43dab6295fc8b8fb447ffb2aa9bae2b27d87e9b34becee259777e98409",
+    ".claude/agents/rust-release-steward.md": "685330d5ae74aaf95622540f0634f5eb210b6f17f7f19c94e2bb9dd9a68689b5",
+    ".claude/agents/rust-solution-architect.md": "1ad46075ee1357d4671ca33ec4616d6f0b2e54f9ffc30e724153f4d529aab09a",
+    ".claude/agents/rust-validation-engineer.md": "5b6ef702f8273b0a83c404f9a4c44b9f54b3c8c32b688efeeb80e13899b9fd88",
+    ".claude/skills/rust-adr/SKILL.md": "e635e0c2acfa519fb29533b6d48d4e4c398d12d3463a2b84533b20885c49cb76",
+    ".claude/skills/rust-code-review/SKILL.md": "83ffd6b9a7a212ad5380d9bc0f8e1cc1bd4336f794b4b1579720b38c90d49aa9",
+    ".claude/skills/rust-deliver/SKILL.md": "a5956159c9ade50e2bd1f4770702ded4244cb1e2aacd6177d5dfa6c78f43a012",
+    ".claude/skills/rust-flow-intake/SKILL.md": "f055953c044fff108edf3519df9f7acd94c9f34aec89f685bf279d43425579f1",
+    ".claude/skills/rust-git-workflow/SKILL.md": "21b256425b071e2c7a3333b0f46e7eaa716852a9dedb4cf3d0961fdd02bc26cf",
+    ".claude/skills/rust-implementation/SKILL.md": "c130ffd4cd97bf002a8ce71a044e4b081e106d6e0579a761bca9e1ef43dccb12",
+    ".claude/skills/rust-interruption-recovery/SKILL.md": "2b491cd910ce2dd0b5f1fb51ecb0af500e3112caf42014a49fc72d4402941d51",
+    ".claude/skills/rust-release-readiness/SKILL.md": "039712d67f99d60826fca48a7f51c5b9464ae1e6eac463f05e3676823d01967f",
+    ".claude/skills/rust-solution-architecture/SKILL.md": "0c914f946e2407e094f801b0a0532b8c145f457502b7ec136a1a1ba5143c9cd7",
+    ".claude/skills/rust-solution-architecture/references/architecture-contract.md": "9f32fdf295870bb084083ded4c5f7b96bceed71da3ecb0f65828b1eeb52ad0bb",
+    ".claude/skills/rust-supply-chain-security/SKILL.md": "604e46e0ebd8a702dad6780c51439fdafdc5387cf8b2be9d19d2fde27cfee4b0",
+    ".claude/skills/rust-testing-strategy/SKILL.md": "ed7f759fe810cc4f5a2479ca3d3e6915de841dfa3f57076c809d9ffb2a277cea",
+    ".claude/skills/rust-validation/SKILL.md": "e5e303582cad63ddc22a6db961d71d8a284bfa15833f692cd0e642f1774824f1",
+    ".claude/skills/rust-work-item-traceability/SKILL.md": "9f2022553335fa651ffe8a87fb09721b63bd2f4b25eafe3cd21ec735bd731a2f",
+    ".codex/agents/rust-implementer.toml": "7299b68745c6650a306c0fbcab2c126165872cf0494bba30803d43e69d2d0eb3",
+    ".codex/agents/rust-intake-planner.toml": "6fe8e29a0bc160b8e4f856283cadd9c0f3f32acb6a649082c0e91f5a73e4ec13",
+    ".codex/agents/rust-quality-reviewer.toml": "f862d13421d80312a2d3d0005b6bad9a93381f5bebbc0e4e2c9663178a12fb3e",
+    ".codex/agents/rust-release-steward.toml": "496ab54461594be4ef34b9402d92630df9d671890a66307d3807100d8920d86b",
+    ".codex/agents/rust-solution-architect.toml": "3a85d8c6acca754ed734f6a4a29a2946fe860dfb3a18fcbcead7cbf1bec68181",
+    ".codex/agents/rust-validation-engineer.toml": "a92d2cc7a1fc8e1130a005979a74b8383f05d066a1b95aa40d13d291e0eb46b6",
+    ".delivery/.gitignore": "7aa4c190d50e4f754494869099554c203e2447d94b62250329450937869aa80e",
+    ".delivery/README.md": "baabe271c84dbdcabbe2c4df7bf5280d07b1bca577200d30b10253db1508b9b1",
+    ".delivery/checkpoint.py": "70a2f0f0e0fd234738846dc673f112937e6c76b1b6cb58cb6af5d10442dcffb0",
+    ".delivery/sync.py": "92f84b519118ed6a313c2350b42720f694f7c10268b078fd510ab2ffa02885e2"
+  },
+  "blocks": {
+    "AGENTS.md": "c430fc46dbc53d464c0128b82ffee445f8ed8b4da09a7e1e39a214119d0153cc",
+    "CLAUDE.md": "55f93e4f40ffe36ee7fa07da1449fa4da123801e02694440a6802bbad84e736b"
+  },
+  "hooks": [
+    ".claude/settings.json",
+    ".codex/hooks.json"
+  ],
+  "layout": {
+    "claude": {
+      "agents_dir": ".claude/agents",
+      "skills_dir": ".claude/skills"
+    },
+    "codex": {
+      "agents_dir": ".codex/agents",
+      "skills_dir": ".agents/skills"
+    }
+  },
+  "synced_at": "2026-09-14T17:38:44+00:00"
+}

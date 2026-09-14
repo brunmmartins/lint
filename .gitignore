@@ -1,0 +1,37 @@
+# Rust build output
+/target/
+
+# Cargo.lock is committed for binaries and applications (K §10.3, S §19.2). Uncomment only if brief §18
+# records a library that does not commit it.
+# Cargo.lock
+
+# Local environment overrides and secrets (K §22.4, S §12.4)
+.env
+.env.*
+!.env.example
+
+# Local databases and runtime data
+*.db
+*.db-shm
+*.db-wal
+/.local/
+
+# Coverage and profiling output
+/coverage/
+*.profraw
+flamegraph.svg
+
+# Tool output
+/.cache/
+
+# Personal agent settings. The shared .claude/ and .codex/ configuration is committed with the code.
+.claude/settings.local.json
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+
+# Never add these here: .sqlx/ (committed offline query metadata, S §10.3), migrations/, contracts/.
+
+# Parallel card worktrees (.delivery/extensions/orchestrator.md)
+.worktrees/

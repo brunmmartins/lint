@@ -1,0 +1,6 @@
+# The toolchain contributors, editors, and CI use (S §6.1). It is not the MSRV. The MSRV is
+# `rust-version` in Cargo.toml, and only exists if brief §18 promises one (K §10.1).
+[toolchain]
+channel = "1.98.0"
+profile = "minimal"
+components = ["clippy", "rustfmt"]

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import pathlib,runpy,sys; c=pathlib.Path.cwd(); e=next((d/'.delivery/sync.py' for d in (c,*c.parents) if (d/'.delivery/sync.py').is_file()),None); sys.argv=['sync.py','session-start','--tool','codex']; e and runpy.run_path(str(e),run_name='__main__')\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
