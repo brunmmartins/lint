@@ -1,0 +1,13 @@
+# Domain policy crate for lint (ADR-0002). No I/O, no framework types: never add pulldown-cmark, clap,
+# std::fs, or std::env as a dependency here.
+[package]
+name = "lint-domain"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]

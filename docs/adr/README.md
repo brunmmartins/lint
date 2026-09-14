@@ -18,3 +18,9 @@ policy (P §1.1).
 
 | ADR | Decision | Status | Date | Work item |
 |---|---|---|---|---|
+| [ADR-0001](ADR-0001-cli-stack-profile.md) | Adopt only the `cli` stack profile for `lint` | Accepted | 2026-09-14 | `LINT-001` |
+| [ADR-0002](ADR-0002-crate-layout.md) | Split into `domain`, `application`, and a thin `apps/lint` binary | Accepted | 2026-09-14 | `LINT-001` |
+| [ADR-0003](ADR-0003-commonmark-parser-crate.md) | Use `pulldown-cmark` 0.13.4 as the CommonMark parser | Accepted | 2026-09-14 | `LINT-001` |
+| [ADR-0004](ADR-0004-argument-parser-crate.md) | Use `clap` 4.6.6 (derive) as the argument parser | Accepted | 2026-09-14 | `LINT-001` |
+| [ADR-0005](ADR-0005-walker-no-symlink-follow.md) | Walk directories without following symlinks; no walker crate | Accepted | 2026-09-14 | `LINT-001` |
+| [ADR-0006](ADR-0006-exit-code-precedence-and-output-order.md) | I/O faults take exit-code precedence over findings; fixed output order | Accepted | 2026-09-14 | `LINT-001` |

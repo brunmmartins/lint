@@ -8,7 +8,7 @@
 # straight after the template is copied.
 
 [workspace]
-members = []
+members = ["crates/domain", "crates/application", "apps/lint"]
 # Set explicitly: a virtual manifest does not take its resolver from the edition.
 resolver = "3"
 
@@ -24,6 +24,12 @@ publish = false
 # One version per dependency. Members use it with `name.workspace = true` (S §19.1). The template pins
 # nothing: add each dependency with a reviewed, current version when the first crate needs it (S §23).
 [workspace.dependencies]
+lint-domain = { path = "crates/domain" }
+lint-application = { path = "crates/application" }
+# Pinned per ADR-0003; depended on only by apps/lint (never crates/domain or crates/application).
+pulldown-cmark = "0.13.4"
+# Pinned per ADR-0004; depended on only by apps/lint.
+clap = { version = "4.6.6", features = ["derive"] }
 
 # Members opt in with `[lints] workspace = true`. A member without that section gets no lint policy.
 # Lint levels are a starting policy (S §23.1): keep only what the team will maintain. Warnings are
