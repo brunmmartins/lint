@@ -512,3 +512,12 @@ still owns accepting or rejecting each ADR.
 - Delivery status: the delivery event and required post-release verification are observed. The card is not declared Released in this entry because the maintainer authorized the push but did not explicitly exercise the maintainer-only delivery declaration.
 - Rollback: `git revert 7cb0057d681ccc22d6a7e9af17c071fbf2196287`, verify the resulting commit, then perform a separately authorized normal `git push origin main`; no migration cutoff exists.
 - Next: maintainer, declare LINT-001 delivered at remote head `f103f18e2ff145852cca54464ac775a998d08d01`, or withhold declaration and identify the remaining follow-up.
+
+### 2026-09-14: LINT-001 delivery declared by maintainer (rust-release-steward)
+
+- Event: release event
+- Candidate: `7cb0057d681ccc22d6a7e9af17c071fbf2196287`
+- Checks run: checkpoint status gave exit 0 and matched the delivery-declaration stage at clean local head `9780dedd1d7363b62872cc7f24706b383b5d7b25`; local Git identity and ancestry checks gave exit 0, confirming delivered head `f103f18e2ff145852cca54464ac775a998d08d01` contains source candidate `7cb0057d681ccc22d6a7e9af17c071fbf2196287`; local `main` is ahead of `origin/main` by exactly the prior append-only LINT-001 release-evidence commit, with no product-content difference.
+- Checks recommended but not run: none.
+- Evidence: the maintainer explicitly declared “Its delivered.” The preceding 2026-09-14 release-event entry records that normal non-force push created GitHub `main` at `f103f18e2ff145852cca54464ac775a998d08d01`; a fresh clean clone resolved to that exact commit; `PATH=/usr/local/cargo/bin:$PATH CARGO_BUILD_JOBS=4 CI=true just check` exited 0 with formatting, Clippy, 69 tests, doc tests, rustdoc, and dependency policy passing; and `PATH=/usr/local/cargo/bin:$PATH CARGO_BUILD_JOBS=4 cargo run --release -p lint -- docs` exited 0 with zero lint-output bytes. Delivery observation time: `2026-09-14T19:52:22Z`.
+- Delivery: `lint@0.1.0` from GitHub `main` at `f103f18e2ff145852cca54464ac775a998d08d01`, sourced from integration candidate `7cb0057d681ccc22d6a7e9af17c071fbf2196287`, is declared Released by the maintainer. No new outbound action, push, tag, deletion, or repository change occurred during this declaration stage.
