@@ -1,4 +1,4 @@
-//! AC5: multiple paths mixing a clean file, a dirty file, and a directory report findings from
+//! Multiple paths mixing a clean file, a dirty file, and a directory report findings from
 //! every path, in input order, and exit 1 if any produced a finding.
 
 mod support;

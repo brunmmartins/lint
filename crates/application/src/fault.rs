@@ -13,7 +13,7 @@ pub enum WalkFault {
     Unreadable {
         /// The offending path.
         path: PathBuf,
-        /// A human-readable detail (never file contents; brief §8).
+        /// A human-readable detail (never file contents).
         detail: String,
     },
 }
@@ -25,7 +25,7 @@ pub enum ReadFault {
     Unreadable {
         /// The offending path.
         path: PathBuf,
-        /// A human-readable detail (never file contents; brief §8).
+        /// A human-readable detail (never file contents).
         detail: String,
     },
     /// The file is larger than the size bound enforced before allocating a read buffer.
@@ -43,7 +43,7 @@ pub enum ReadFault {
 }
 
 /// The unified fault taxonomy the composition root reports on stderr and folds into the exit-code
-/// decision (ADR-0006). Never a raw `io::Error`: ports translate at their own boundary.
+/// decision. Never a raw `io::Error`: ports translate at their own boundary.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LintFault {
     /// The path does not exist on disk.

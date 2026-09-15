@@ -31,7 +31,7 @@ impl Finding {
         self.location
     }
 
-    /// The human-readable message, with no file contents echoed into it (brief §8).
+    /// The human-readable message, with no file contents echoed into it.
     #[must_use]
     pub fn message(&self) -> &str {
         &self.message

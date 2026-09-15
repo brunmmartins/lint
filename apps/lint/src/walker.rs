@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use lint_application::{WalkFault, Walker};
 
-/// Walks the real file system without ever following a symlink as a directory (ADR-0005). A
+/// Walks the real file system without ever following a symlink as a directory. A
 /// symlink loop is therefore structurally impossible to form during traversal, not merely bounded.
 ///
 /// Traversal is iterative (an explicit `Vec<PathBuf>` stack), never recursive, so directory depth
@@ -29,14 +29,15 @@ impl Walker for StdWalker {
             walk_directory(input)
         } else {
             // An explicit file path (including a symlink to a file) is always linted regardless
-            // of extension, since naming it directly is explicit user intent (ADR-0005).
+            // of extension, since naming it directly is explicit user intent.
             Ok(vec![input.to_path_buf()])
         }
     }
 }
 
-/// Iterative depth-first walk in sorted-by-name order (ADR-0005). Never follows a symlink as a
-/// directory: `symlink_metadata` (never `metadata`) decides whether to recurse.
+/// Iterative depth-first walk in sorted-by-name order, so the result does not depend on the order
+/// the OS lists directory entries. Never follows a symlink as a directory: `symlink_metadata`
+/// (never `metadata`) decides whether to recurse.
 fn walk_directory(root: &Path) -> Result<Vec<PathBuf>, WalkFault> {
     let mut results = Vec::new();
     let mut stack = sorted_children(root)?;
@@ -48,8 +49,8 @@ fn walk_directory(root: &Path) -> Result<Vec<PathBuf>, WalkFault> {
     while let Some(entry) = stack.pop() {
         let metadata = match std::fs::symlink_metadata(&entry) {
             Ok(metadata) => metadata,
-            // The entry vanished between listing its parent and stat-ing it (a benign race, not
-            // an input this card's ACs exercise); skip it rather than fail the whole walk.
+            // The entry vanished between listing its parent and stat-ing it (a benign race with
+            // another process); skip it rather than fail the whole walk.
             Err(_) => continue,
         };
 
@@ -100,7 +101,7 @@ mod tests {
 
     /// Builds a fresh, unique temp directory for one test. The name folds in the process ID, the
     /// current timestamp, and a process-local atomic counter, so two calls racing on the same
-    /// clock tick within this test binary can never collide (rework of F1: pid+nanos alone raced
+    /// clock tick within this test binary can never collide (the process ID and timestamp alone raced
     /// under parallel test threads).
     fn tempdir() -> PathBuf {
         use std::sync::atomic::{AtomicU64, Ordering};

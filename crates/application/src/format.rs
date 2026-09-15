@@ -2,7 +2,7 @@ use std::path::Path;
 
 use lint_domain::Finding;
 
-/// Formats one finding as the fixed `path:line:col RULE message` text line (brief §3, §6).
+/// Formats one finding as the fixed `path:line:col RULE message` text line.
 #[must_use]
 pub fn format_finding(path: &Path, finding: &Finding) -> String {
     format!(
@@ -14,8 +14,8 @@ pub fn format_finding(path: &Path, finding: &Finding) -> String {
     )
 }
 
-/// Decides the process exit code from whether any fault or any finding occurred, per ADR-0006's
-/// fixed precedence: a fault (I/O-class problem) always wins over a finding, regardless of how
+/// Decides the process exit code from whether any fault or any finding occurred, with a fixed
+/// precedence: a fault (I/O-class problem) always wins over a finding, regardless of how
 /// many of either occurred, because it means the invocation could not be trusted to have
 /// inspected everything asked of it.
 ///
@@ -66,8 +66,7 @@ mod tests {
 
     #[test]
     fn fault_takes_precedence_over_a_finding_present_in_the_same_run() {
-        // ADR-0006: not exercised end-to-end by any single AC, added here per the contract's
-        // "Left unverified" instruction to cover the mixed fault-plus-finding case.
+        // The mixed case: a fault still wins when a finding is also present in the same run.
         assert_eq!(decide_exit_code(true, true), 2);
     }
 }

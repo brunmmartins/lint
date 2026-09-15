@@ -1,4 +1,4 @@
-//! AC8: a file that exists but cannot be read (permission denied) prints an error naming the path
+//! A file that exists but cannot be read (permission denied) prints an error naming the path
 //! to stderr and exits 2, without a panic.
 
 mod support;
@@ -16,9 +16,9 @@ fn permission_denied_file_prints_error_to_stderr_and_exits_two() {
 
     std::fs::set_permissions(&file, std::fs::Permissions::from_mode(0o644)).unwrap();
 
-    // Left unverified when the test runner is root: permission bits are bypassed for root on
-    // most platforms, so the read can succeed instead of failing (architecture contract, "Left
-    // unverified"). Only assert the failure shape when the read did fail.
+    // Not verifiable when the test runner is root: permission bits are bypassed for root on
+    // most platforms, so the read can succeed instead of failing. Only assert the failure shape
+    // when the read did fail.
     if output.status.code() != Some(0) {
         assert_eq!(output.status.code(), Some(2));
         assert_eq!(support::stdout(&output), "");

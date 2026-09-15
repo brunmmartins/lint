@@ -1,17 +1,17 @@
 use lint_application::MarkdownParser;
 
 /// Drives `pulldown-cmark`'s parser to completion over the source, for its structural
-/// robustness/validity property (ADR-0003: non-recursive block parsing, so hostile input such as
+/// robustness/validity property (its block parsing is non-recursive, so hostile input such as
 /// deeply nested block structure cannot overflow the stack here). The event stream itself is not
-/// yet retained as domain structure in this card; [`lint_domain::Document`] is built from the
-/// source's own lines.
+/// yet retained as domain structure; [`lint_domain::Document`] is built from the source's own
+/// lines.
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PulldownMarkdownParser;
 
 impl MarkdownParser for PulldownMarkdownParser {
     fn parse(&self, source: &str) -> lint_domain::Document {
         for _event in pulldown_cmark::Parser::new(source) {
-            // Drained only to exercise the parser's own robustness guarantee; this card's rules
+            // Drained only to exercise the parser's own robustness guarantee; the current rules
             // (MD009, MD047) operate on raw line text, not on the event stream.
         }
         lint_domain::Document::from_source(source)

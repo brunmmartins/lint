@@ -5,7 +5,7 @@ use crate::{ReadFault, WalkFault};
 /// Resolves one CLI input (a file or a directory) into zero or more Markdown file paths to lint.
 pub trait Walker {
     /// Resolves `input`. For a directory, returns the Markdown files found under it, in
-    /// sorted-by-name, depth-first order (ADR-0005); for a file, returns that one path.
+    /// sorted-by-name, depth-first order; for a file, returns that one path.
     ///
     /// # Errors
     ///
@@ -26,7 +26,7 @@ pub trait SourceReader {
 
 /// Parses Markdown source into a [`lint_domain::Document`].
 pub trait MarkdownParser {
-    /// Parses `source`. Infallible for this card's scope: `pulldown-cmark` does not error on
-    /// malformed Markdown (ADR-0003).
+    /// Parses `source`. Infallible: `pulldown-cmark`, the parser behind this port, does not error
+    /// on malformed Markdown.
     fn parse(&self, source: &str) -> lint_domain::Document;
 }

@@ -7,7 +7,7 @@ use crate::{LintFault, MarkdownParser, SourceReader, Walker};
 /// The result of linting every input path given to [`run_lint`].
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct LintOutcome {
-    /// Every finding, paired with the file it came from, in output order (ADR-0006: input order,
+    /// Every finding, paired with the file it came from, in output order (input order,
     /// then each directory's sorted walk order, then `(line, column)` within one file).
     pub findings: Vec<(PathBuf, Finding)>,
     /// Every fault encountered, in the input order that produced it. A fault on one path never
@@ -18,8 +18,8 @@ pub struct LintOutcome {
 /// Walks, reads, parses, and checks every path in `inputs`, in order.
 ///
 /// A fault on one input (not found, unreadable, too large, invalid UTF-8) is recorded and that
-/// input is skipped; every other input is still processed (contract: "must not let a single
-/// unreadable/nonexistent/oversized path abort processing of the other paths").
+/// input is skipped; every other input is still processed, so one bad path never
+/// hides the problems in the others.
 pub fn run_lint<W, R, P>(inputs: &[PathBuf], walker: &W, reader: &R, parser: &P) -> LintOutcome
 where
     W: Walker,

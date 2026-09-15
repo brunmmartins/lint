@@ -1,4 +1,4 @@
-//! AC7: a nonexistent path prints an error naming the path to stderr and exits 2, without
+//! A nonexistent path prints an error naming the path to stderr and exits 2, without
 //! crashing and without silently skipping the path (and without skipping a sibling valid path).
 
 mod support;
@@ -26,7 +26,7 @@ fn a_nonexistent_path_does_not_stop_a_sibling_valid_path_from_being_linted() {
 
     let output = support::run_lint(&[missing.to_str().unwrap(), dirty.to_str().unwrap()]);
 
-    // A fault takes exit-code precedence over a finding (ADR-0006), but the valid path's finding
+    // A fault takes exit-code precedence over a finding, but the valid path's finding
     // is still printed.
     assert_eq!(output.status.code(), Some(2));
     let expected = format!("{}:1:6 MD009 trailing whitespace\n", dirty.display());

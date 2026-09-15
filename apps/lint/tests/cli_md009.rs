@@ -1,4 +1,4 @@
-//! AC2: a file with a trailing-space line reports one MD009 finding and exits 1.
+//! A file with a trailing-space line reports one MD009 finding and exits 1.
 
 mod support;
 

@@ -1,9 +1,9 @@
 use std::fmt;
 
-/// The closed set of rules this card implements.
+/// The closed set of rules `lint` currently implements.
 ///
 /// `Display` prints the rule's canonical identifier (`"MD009"`, `"MD047"`), matching the
-/// `path:line:col RULE message` output format (brief §3, §6).
+/// `path:line:col RULE message` output format.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[non_exhaustive]
 pub enum RuleId {

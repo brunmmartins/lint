@@ -1,4 +1,4 @@
-# Use-case orchestration crate for lint (ADR-0002): ports, the LintFault taxonomy, run_lint, and the
+# Use-case orchestration crate for lint: ports, the LintFault taxonomy, run_lint, and the
 # pure format_finding/decide_exit_code functions. Depends on lint-domain only.
 [package]
 name = "lint-application"

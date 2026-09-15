@@ -1,4 +1,4 @@
-//! AC1: a single clean Markdown file prints nothing and exits 0.
+//! A single clean Markdown file prints nothing and exits 0.
 
 mod support;
 

@@ -1,4 +1,4 @@
-//! The rule implementations in scope for LINT-001, and the static registry the engine iterates.
+//! The rule implementations, and the static registry the engine iterates.
 
 mod md009;
 mod md047;
@@ -8,9 +8,9 @@ pub use md047::Md047;
 
 use crate::Rule;
 
-/// The registry of rules this card runs, in the order their findings are merged (ADR-0006 then
-/// sorts all of one file's findings by `(line, column)`, so registry order only matters as the
-/// tie-break for findings at the same location).
+/// The registry of rules `lint` runs, in the order their findings are merged (all of one file's
+/// findings are then sorted by `(line, column)`, so registry order only matters as the tie-break
+/// for findings at the same location).
 pub const RULES: &[&dyn Rule] = &[&Md009, &Md047];
 
 #[cfg(test)]

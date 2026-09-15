@@ -1,8 +1,8 @@
 //! Shared helpers for the `tests/cli_*.rs` integration tests, which run the built `lint` binary
-//! directly (`std::process::Command` + `CARGO_BIN_EXE_lint`) rather than adding a dev-dependency
-//! the architecture contract does not name.
+//! directly (`std::process::Command` + `CARGO_BIN_EXE_lint`) rather than adding a process-testing
+//! dev-dependency.
 //!
-//! Each `tests/cli_*.rs` file compiles this module into its own separate test binary (S §14.1),
+//! Each `tests/cli_*.rs` file compiles this module into its own separate test binary,
 //! so any one binary that does not call every helper here is expected, not dead code.
 #![allow(dead_code)]
 
@@ -22,7 +22,7 @@ pub fn run_lint(args: &[&str]) -> Output {
 /// Creates a fresh, empty temporary directory under the system temp directory, unique to this
 /// process and call. The name folds in the process ID, the current timestamp, and a process-local
 /// atomic counter, so two calls racing on the same clock tick within this test binary can never
-/// collide (rework of F1: pid+nanos alone raced under parallel test threads).
+/// collide (the process ID and timestamp alone raced under parallel test threads).
 pub fn temp_dir(label: &str) -> PathBuf {
     use std::sync::atomic::{AtomicU64, Ordering};
 

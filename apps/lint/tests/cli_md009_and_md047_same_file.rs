@@ -1,4 +1,4 @@
-//! AC10: a file with both a trailing-space line and a missing final newline reports both MD009
+//! A file with both a trailing-space line and a missing final newline reports both MD009
 //! and MD047 findings, with independent, correct locations, and exits 1.
 
 mod support;

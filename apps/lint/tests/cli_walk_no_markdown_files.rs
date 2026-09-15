@@ -1,4 +1,4 @@
-//! AC9: a directory containing no Markdown files prints nothing, prints no error, and exits 0.
+//! A directory containing no Markdown files prints nothing, prints no error, and exits 0.
 
 mod support;
 

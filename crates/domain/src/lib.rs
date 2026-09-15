@@ -1,5 +1,5 @@
 //! `lint-domain`: value objects, the [`Document`] type, the [`Rule`] trait, and the MD009/MD047
-//! rule implementations for `lint` (ADR-0002).
+//! rule implementations for `lint`.
 //!
 //! This crate has no dependency on I/O or a framework: no `pulldown-cmark`, no `clap`, no
 //! `std::fs`, no `std::env`. Everything here is a pure function over already-loaded data, so it is

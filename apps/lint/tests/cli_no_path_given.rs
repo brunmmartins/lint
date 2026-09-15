@@ -1,4 +1,4 @@
-//! AC6: no path argument prints a usage message to stderr and exits 2.
+//! No path argument prints a usage message to stderr and exits 2.
 
 mod support;
 

@@ -1,5 +1,5 @@
 //! `lint`'s composition root: the only place that parses arguments, touches the file system, or
-//! calls `pulldown-cmark` (ADR-0001, ADR-0002).
+//! calls `pulldown-cmark`.
 
 mod cli;
 mod parser;
@@ -16,7 +16,7 @@ use walker::StdWalker;
 
 fn main() -> std::process::ExitCode {
     // A missing or invalid argument exits through clap's own usage-error path: a usage message on
-    // stderr and exit code 2 (ADR-0004), satisfying AC6 with no custom error handling.
+    // stderr and exit code 2, with no custom error handling.
     let cli = Cli::parse();
 
     let walker = StdWalker;

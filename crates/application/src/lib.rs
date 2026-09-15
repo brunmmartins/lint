@@ -1,6 +1,6 @@
 //! `lint-application`: the [`Walker`], [`SourceReader`], and [`MarkdownParser`] ports, the
 //! [`LintFault`] taxonomy, the [`run_lint`] use case, and the pure [`format_finding`] and
-//! [`decide_exit_code`] functions (ADR-0002).
+//! [`decide_exit_code`] functions.
 //!
 //! Depends on `lint-domain` only: no `pulldown-cmark`, `clap`, `std::fs`, or `std::env` here
 //! either — those live behind the ports, implemented by adapters in `apps/lint`.

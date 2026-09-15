@@ -1,5 +1,5 @@
-# The toolchain contributors, editors, and CI use (S §6.1). It is not the MSRV. The MSRV is
-# `rust-version` in Cargo.toml, and only exists if brief §18 promises one (K §10.1).
+# The toolchain contributors, editors, and CI use. It is not the MSRV. The MSRV is `rust-version` in
+# Cargo.toml, and exists only once the project promises one.
 [toolchain]
 channel = "1.98.0"
 profile = "minimal"

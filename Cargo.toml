@@ -1,11 +1,8 @@
-# Workspace manifest for lint (S §6.2, §23.1).
+# Workspace manifest for lint.
 #
 # List every crate in `members` explicitly, and only once it exists. A crate missing from the list is
 # silently left out of every `--workspace` command, including the quality gate. A glob such as
 # "crates/*" is not a shortcut: Cargo rejects a glob that matches no directory.
-#
-# Until the first crate is added, Cargo stops with "the workspace has no members". That is expected
-# straight after the template is copied.
 
 [workspace]
 members = ["crates/domain", "crates/application", "apps/lint"]
@@ -17,23 +14,25 @@ resolver = "3"
 [workspace.package]
 edition = "2024"
 license = "MIT OR Apache-2.0"
-# Set `publish = true` on a member only when brief §7 says that crate is published.
+# Set `publish = true` on a member only once that crate is meant to be published to a registry.
 publish = false
-# rust-version = "x.y"   # Only if brief §18 promises an MSRV, and only with a CI job that builds with it (K §10.1).
+# rust-version = "x.y"   # Only once the project promises an MSRV, and with a CI job that builds with it.
 
-# One version per dependency. Members use it with `name.workspace = true` (S §19.1). The template pins
-# nothing: add each dependency with a reviewed, current version when the first crate needs it (S §23).
+# One version per dependency. Members use it with `name.workspace = true`. Add each dependency with a
+# reviewed, current version when the first crate needs it.
 [workspace.dependencies]
 lint-domain = { path = "crates/domain" }
 lint-application = { path = "crates/application" }
-# Pinned per ADR-0003; depended on only by apps/lint (never crates/domain or crates/application).
+# CommonMark parser. Depended on only by apps/lint (never crates/domain or crates/application), so the
+# domain and application crates stay free of parser types.
 pulldown-cmark = "0.13.4"
-# Pinned per ADR-0004; depended on only by apps/lint.
+# Command-line argument parser. Depended on only by apps/lint.
 clap = { version = "4.6.6", features = ["derive"] }
 
 # Members opt in with `[lints] workspace = true`. A member without that section gets no lint policy.
-# Lint levels are a starting policy (S §23.1): keep only what the team will maintain. Warnings are
-# denied on the command line, never with `#![deny(warnings)]` (K §12.1).
+# Keep only the lint levels the project will maintain. Warnings are denied on the command line, never
+# with `#![deny(warnings)]` in source, which would let any new compiler warning break the build for
+# everyone who compiles it.
 [workspace.lints.rust]
 unsafe_code = "forbid"
 unused_must_use = "deny"
@@ -43,8 +42,9 @@ dbg_macro = "deny"
 todo = "warn"
 unwrap_used = "warn"
 
-# Build profiles go below. Measure with `cargo build --timings` before adding anything (S §6.5).
+# Build profiles go below. Measure with `cargo build --timings` before adding anything.
 # Settings that change codegen change what is tested, so keep them here rather than in personal config.
 #
 # [profile.release]
-# overflow-checks = ...   # Open choice (P §20). Decide before the first release build; record it in brief §18.
+# overflow-checks = ...   # Undecided: release builds wrap on integer overflow unless this is true.
+#                         # Decide before the first release build.

@@ -3,7 +3,7 @@ use std::num::NonZeroUsize;
 
 /// A 1-based line and column position inside a [`Document`](crate::Document).
 ///
-/// Both `line` and `col` are `NonZeroUsize`: the `path:line:col` output format (brief §3, §6) is
+/// Both `line` and `col` are `NonZeroUsize`: the `path:line:col` output format is
 /// 1-based, and [`Location::new`] is the only place a zero value is rejected.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Location {

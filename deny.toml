@@ -1,7 +1,7 @@
-# Dependency policy for lint, checked by `just deny` (S §17.2, K §16.3).
+# Dependency policy for lint, checked by `just deny`.
 #
 # Every exception carries a reason, an owner, and a removal condition. Scanner output is triaged for
-# reachability and exposure, not accepted or dismissed on its score (K §16.3).
+# reachability and exposure, not accepted or dismissed on its score.
 
 [graph]
 all-features = true
@@ -13,8 +13,8 @@ ignore = [
 ]
 
 [licenses]
-# A starting allow-list. Brief §18 decides the third-party licence policy, and widening this list is a
-# policy change, not a build fix. Unicode-3.0 is here because almost every proc-macro dependency brings it.
+# The third-party licence allow-list. Widening it is a deliberate licence-policy change, not a build
+# fix. Unicode-3.0 is here because almost every proc-macro dependency brings it.
 allow = ["Apache-2.0", "MIT", "Unicode-3.0"]
 confidence-threshold = 0.93
 # An allowed licence that no dependency uses yet is not a finding.

@@ -5,7 +5,7 @@ use clap::Parser;
 /// Lint Markdown files for style problems.
 ///
 /// Exit status: `0` when no finding remains, `1` when at least one finding remains, `2` on a
-/// usage, configuration, or I/O error (brief §6).
+/// usage, configuration, or I/O error.
 #[derive(Debug, Parser)]
 #[command(name = "lint", version, about)]
 pub struct Cli {

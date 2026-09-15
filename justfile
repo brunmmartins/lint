@@ -1,11 +1,11 @@
-# Command contract for lint (S §16.1).
+# Command contract for lint.
 #
 # Every recipe here is listed in CONTRIBUTING.md with the commands it runs, and every `just <recipe>`
 # named in this repository's documentation exists here. Change both in the same commit.
 #
-# CI runs these same recipes with CI set, which adds --locked (S §16.5, K §20.4). The recipes assume
-# the workspace has at least one library crate, because Cargo rejects --lib and --doc without one.
-# A stack profile adds recipes only when it adds something to run, such as `run` or `infra-up`.
+# CI runs these same recipes with CI set, which adds --locked so a CI build never rewrites Cargo.lock.
+# The recipes assume the workspace has at least one library crate, because Cargo rejects --lib and
+# --doc without one. Add a recipe only when there is something new to run, such as `run`.
 
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
@@ -59,7 +59,7 @@ test:
     if cargo nextest --version >/dev/null 2>&1; then
         cargo nextest run {{locked}} --workspace --all-features --no-tests=warn
     else
-        echo "cargo-nextest not installed: using cargo test (S §2.4)" >&2
+        echo "cargo-nextest not installed: using cargo test" >&2
         cargo test {{locked}} --workspace --all-features --all-targets
     fi
     cargo test {{locked}} --doc --workspace --all-features

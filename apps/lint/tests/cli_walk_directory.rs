@@ -1,4 +1,4 @@
-//! AC4: a directory with nested Markdown files, some clean and some dirty, is walked recursively;
+//! A directory with nested Markdown files, some clean and some dirty, is walked recursively;
 //! every problem is reported and the exit code reflects whether any finding occurred.
 
 mod support;

@@ -1,4 +1,4 @@
-//! AC3: a file missing (or with more than) a single trailing newline reports one MD047 finding
+//! A file missing (or with more than) a single trailing newline reports one MD047 finding
 //! and exits 1.
 
 mod support;

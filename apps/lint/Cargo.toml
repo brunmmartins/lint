@@ -1,5 +1,5 @@
-# Composition root and every adapter for lint (ADR-0002). The only crate allowed to depend on
-# pulldown-cmark or clap (ADR-0003, ADR-0004).
+# Composition root and every adapter for lint. The only crate allowed to depend on pulldown-cmark or
+# clap, so parsing and argument-handling libraries stay out of the domain and application crates.
 [package]
 name = "lint"
 version = "0.1.0"

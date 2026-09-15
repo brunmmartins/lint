@@ -13,11 +13,11 @@
 /CLAUDE.md
 /CHANGELOG.md
 
-# Cargo.lock is committed for binaries and applications (K §10.3, S §19.2). Uncomment only if brief §18
-# records a library that does not commit it.
+# Cargo.lock is committed because the workspace builds a binary, so every build resolves the same
+# dependency versions. Uncomment only if the project becomes a library that does not commit it.
 # Cargo.lock
 
-# Local environment overrides and secrets (K §22.4, S §12.4)
+# Local environment overrides and secrets
 .env
 .env.*
 !.env.example
@@ -40,7 +40,7 @@ flamegraph.svg
 .DS_Store
 Thumbs.db
 
-# Never add these here: .sqlx/ (committed offline query metadata, S §10.3), migrations/, contracts/.
+# Never add these here: .sqlx/ (committed offline query metadata), migrations/, contracts/.
 
-# Parallel card worktrees (.delivery/extensions/orchestrator.md)
+# Linked Git worktrees at any depth
 .worktrees/

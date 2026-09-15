@@ -2,8 +2,8 @@ use std::path::Path;
 
 use lint_application::{ReadFault, SourceReader};
 
-/// The size bound enforced before any read buffer is allocated (K §22.2: "validation happens
-/// before allocation"). Fixed by the architecture contract's runtime-behavior section.
+/// The size bound enforced before any read buffer is allocated, so an oversized input is rejected
+/// from its metadata instead of being loaded into memory first.
 pub const MAX_FILE_BYTES: u64 = 10 * 1024 * 1024;
 
 /// Reads a file's bytes from the real file system, enforcing [`MAX_FILE_BYTES`] via
@@ -105,9 +105,9 @@ mod tests {
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o644)).unwrap();
         std::fs::remove_dir_all(&dir).unwrap();
 
-        // Left unverified when the test runner is root: permission bits are bypassed for root on
-        // most platforms, so the read succeeds instead of failing (architecture contract, "Left
-        // unverified"). Only assert the failure shape when the read did fail.
+        // Not verifiable when the test runner is root: permission bits are bypassed for root on
+        // most platforms, so the read succeeds instead of failing. Only assert the failure shape
+        // when the read did fail.
         if let Err(fault) = result {
             assert!(matches!(fault, ReadFault::Unreadable { .. }));
         }
@@ -115,7 +115,7 @@ mod tests {
 
     /// Builds a fresh, unique temp directory for one test. The name folds in the process ID, the
     /// current timestamp, and a process-local atomic counter, so two calls racing on the same
-    /// clock tick within this test binary can never collide (rework of F1: pid+nanos alone raced
+    /// clock tick within this test binary can never collide (the process ID and timestamp alone raced
     /// under parallel test threads).
     fn tempdir() -> std::path::PathBuf {
         use std::sync::atomic::{AtomicU64, Ordering};

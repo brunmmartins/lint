@@ -1,6 +1,6 @@
-//! AC11: a directory tree containing a symbolic-link loop never causes `lint` to hang (or panic).
-//! Unix-only (brief §11's target platform), asserting process termination within a bounded
-//! wall-clock timeout — non-termination is the failure mode under test.
+//! A directory tree containing a symbolic-link loop never causes `lint` to hang (or panic).
+//! Unix-only, because it builds the loop with a Unix symlink. It asserts process termination within
+//! a bounded wall-clock timeout — non-termination is the failure mode under test.
 
 mod support;
 
