@@ -4,12 +4,21 @@ use lint_domain::{Finding, RULES};
 
 use crate::{LintFault, MarkdownParser, SourceReader, Walker};
 
+/// The findings of one file, with its path stored once.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FileFindings {
+    /// The file the findings came from.
+    pub path: PathBuf,
+    /// The file's findings, sorted by location and then by rule ID.
+    pub findings: Vec<Finding>,
+}
+
 /// The result of linting every input path given to [`run_lint`].
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct LintOutcome {
-    /// Every finding, paired with the file it came from, in output order (input order,
-    /// then each directory's sorted walk order, then `(line, column)` within one file).
-    pub findings: Vec<(PathBuf, Finding)>,
+    /// One entry per file that has at least one finding, in output order: input order, then each
+    /// directory's sorted walk order.
+    pub findings: Vec<FileFindings>,
     /// Every fault encountered, in the input order that produced it. A fault on one path never
     /// stops the other paths from being processed.
     pub faults: Vec<LintFault>,
@@ -60,13 +69,20 @@ where
         .iter()
         .flat_map(|rule| rule.check(&document))
         .collect();
-    findings.sort_by_key(Finding::location);
+    if findings.is_empty() {
+        return;
+    }
+    sort_file_findings(&mut findings);
 
-    outcome.findings.extend(
-        findings
-            .into_iter()
-            .map(|finding| (file.to_path_buf(), finding)),
-    );
+    outcome.findings.push(FileFindings {
+        path: file.to_path_buf(),
+        findings,
+    });
+}
+
+/// Orders one file's findings by location, then by rule ID for findings at the same location.
+fn sort_file_findings(findings: &mut [Finding]) {
+    findings.sort_by_key(|finding| (finding.location(), finding.rule()));
 }
 
 #[cfg(test)]
@@ -157,7 +173,7 @@ mod tests {
 
         assert_eq!(outcome.faults.len(), 1);
         assert_eq!(outcome.findings.len(), 1);
-        assert_eq!(outcome.findings[0].0, PathBuf::from("dirty.md"));
+        assert_eq!(outcome.findings[0].path, PathBuf::from("dirty.md"));
     }
 
     #[test]
@@ -177,8 +193,8 @@ mod tests {
         let outcome = run_lint(&[PathBuf::from("dir")], &walker, &reader, &FakeParser);
 
         assert_eq!(outcome.findings.len(), 2);
-        assert_eq!(outcome.findings[0].0, PathBuf::from("dir/a.md"));
-        assert_eq!(outcome.findings[1].0, PathBuf::from("dir/b.md"));
+        assert_eq!(outcome.findings[0].path, PathBuf::from("dir/a.md"));
+        assert_eq!(outcome.findings[1].path, PathBuf::from("dir/b.md"));
     }
 
     #[test]
@@ -194,8 +210,84 @@ mod tests {
 
         let outcome = run_lint(&[PathBuf::from("both.md")], &walker, &reader, &FakeParser);
 
-        assert_eq!(outcome.findings.len(), 2);
-        assert!(outcome.findings[0].1.location() < outcome.findings[1].1.location());
+        let findings = &outcome.findings[0].findings;
+        assert_eq!(findings.len(), 2);
+        assert!(findings[0].location() < findings[1].location());
+    }
+
+    #[test]
+    fn same_location_findings_sort_by_rule_id() {
+        use lint_domain::{FindingMessage, Location, RuleId};
+
+        let at = |line, col| Location::new(line, col).unwrap();
+        let mut findings = vec![
+            Finding::new(
+                RuleId::Md047,
+                at(3, 1),
+                FindingMessage::MultipleTrailingNewlines,
+            ),
+            Finding::new(RuleId::Md010, at(1, 4), FindingMessage::HardTab),
+            Finding::new(
+                RuleId::Md012,
+                at(3, 1),
+                FindingMessage::MultipleBlankLines {
+                    maximum: 1,
+                    found: 2,
+                },
+            ),
+            Finding::new(RuleId::Md009, at(1, 4), FindingMessage::TrailingWhitespace),
+        ];
+
+        sort_file_findings(&mut findings);
+
+        let order: Vec<(Location, RuleId)> = findings
+            .iter()
+            .map(|finding| (finding.location(), finding.rule()))
+            .collect();
+        assert_eq!(
+            order,
+            [
+                (at(1, 4), RuleId::Md009),
+                (at(1, 4), RuleId::Md010),
+                (at(3, 1), RuleId::Md012),
+                (at(3, 1), RuleId::Md047),
+            ]
+        );
+
+        // Through the use case as well: a trailing tab gives MD009 and MD010 at one location.
+        let walker = FakeWalker {
+            resolutions: HashMap::new(),
+        };
+        let mut sources = HashMap::new();
+        sources.insert(PathBuf::from("tab.md"), Ok("abc\t\n".to_string()));
+        let reader = FakeReader { sources };
+
+        let outcome = run_lint(&[PathBuf::from("tab.md")], &walker, &reader, &FakeParser);
+
+        let rules: Vec<RuleId> = outcome.findings[0]
+            .findings
+            .iter()
+            .map(Finding::rule)
+            .collect();
+        assert_eq!(rules, [RuleId::Md009, RuleId::Md010]);
+    }
+
+    #[test]
+    fn a_file_without_findings_gets_no_entry() {
+        let walker = FakeWalker {
+            resolutions: HashMap::new(),
+        };
+        let mut sources = HashMap::new();
+        sources.insert(PathBuf::from("clean.md"), Ok("clean\n".to_string()));
+        sources.insert(PathBuf::from("dirty.md"), Ok("a\tb\n".to_string()));
+        let reader = FakeReader { sources };
+
+        let inputs = [PathBuf::from("clean.md"), PathBuf::from("dirty.md")];
+        let outcome = run_lint(&inputs, &walker, &reader, &FakeParser);
+
+        assert_eq!(outcome.findings.len(), 1);
+        assert_eq!(outcome.findings[0].path, PathBuf::from("dirty.md"));
+        assert_eq!(outcome.findings[0].findings.len(), 1);
     }
 
     #[test]

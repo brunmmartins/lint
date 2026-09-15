@@ -1,4 +1,4 @@
-use crate::{Document, Finding, Location, Rule, RuleId};
+use crate::{Document, Finding, FindingMessage, Location, Rule, RuleId};
 
 /// MD047 (`single-trailing-newline`): a file must end with exactly one trailing newline.
 ///
@@ -28,7 +28,7 @@ impl Rule for Md047 {
                         vec![Finding::new(
                             RuleId::Md047,
                             location,
-                            "missing single trailing newline",
+                            FindingMessage::MissingTrailingNewline,
                         )]
                     },
                 )
@@ -41,7 +41,7 @@ impl Rule for Md047 {
                         vec![Finding::new(
                             RuleId::Md047,
                             location,
-                            "more than one trailing newline",
+                            FindingMessage::MultipleTrailingNewlines,
                         )]
                     },
                 )

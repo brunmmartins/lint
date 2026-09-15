@@ -13,4 +13,4 @@ mod run_lint;
 pub use fault::{LintFault, ReadFault, WalkFault};
 pub use format::{decide_exit_code, format_finding};
 pub use ports::{MarkdownParser, SourceReader, Walker};
-pub use run_lint::{LintOutcome, run_lint};
+pub use run_lint::{FileFindings, LintOutcome, run_lint};

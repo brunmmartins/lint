@@ -35,7 +35,7 @@ pub fn decide_exit_code(has_fault: bool, has_finding: bool) -> u8 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use lint_domain::{Location, RuleId};
+    use lint_domain::{FindingMessage, Location, RuleId};
     use std::path::PathBuf;
 
     #[test]
@@ -43,7 +43,7 @@ mod tests {
         let finding = Finding::new(
             RuleId::Md009,
             Location::new(3, 5).unwrap(),
-            "trailing whitespace",
+            FindingMessage::TrailingWhitespace,
         );
         let line = format_finding(&PathBuf::from("doc.md"), &finding);
         assert_eq!(line, "doc.md:3:5 MD009 trailing whitespace");

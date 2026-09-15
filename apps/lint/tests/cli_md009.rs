@@ -38,7 +38,12 @@ fn trailing_tab_reports_md009() {
     let output = support::run_lint(&[file.to_str().unwrap()]);
 
     assert_eq!(output.status.code(), Some(1));
-    let expected = format!("{}:1:6 MD009 trailing whitespace\n", file.display());
+    // The same tab is also a hard tab, which MD010 reports at the same location, after MD009.
+    let expected = format!(
+        "{}:1:6 MD009 trailing whitespace\n{}:1:6 MD010 hard tab\n",
+        file.display(),
+        file.display()
+    );
     assert_eq!(support::stdout(&output), expected);
 
     std::fs::remove_dir_all(&dir).unwrap();

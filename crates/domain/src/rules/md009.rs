@@ -1,4 +1,4 @@
-use crate::{Document, Finding, Location, Rule, RuleId};
+use crate::{Document, Finding, FindingMessage, Location, Rule, RuleId};
 
 /// MD009 (`no-trailing-spaces`): a line ends with one or more trailing space or tab characters.
 #[derive(Debug, Default, Clone, Copy)]
@@ -20,7 +20,11 @@ impl Rule for Md009 {
             let Ok(location) = Location::new(line_number, column) else {
                 continue;
             };
-            findings.push(Finding::new(RuleId::Md009, location, "trailing whitespace"));
+            findings.push(Finding::new(
+                RuleId::Md009,
+                location,
+                FindingMessage::TrailingWhitespace,
+            ));
         }
         findings
     }

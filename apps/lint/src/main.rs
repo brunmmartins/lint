@@ -25,8 +25,10 @@ fn main() -> std::process::ExitCode {
 
     let outcome = run_lint(&cli.paths, &walker, &reader, &parser);
 
-    for (path, finding) in &outcome.findings {
-        println!("{}", format_finding(path, finding));
+    for file in &outcome.findings {
+        for finding in &file.findings {
+            println!("{}", format_finding(&file.path, finding));
+        }
     }
     for fault in &outcome.faults {
         eprintln!("{fault}");

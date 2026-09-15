@@ -8,7 +8,13 @@ The project is pre-release. It currently checks:
 | Rule | Check |
 |---|---|
 | `MD009` | Trailing spaces and tabs |
+| `MD010` | Hard tabs anywhere, including code blocks and code spans; one finding per run of tabs |
+| `MD012` | More than one consecutive blank line outside fenced and indented code blocks |
+| `MD013` | Lines over 80 characters with whitespace after column 80; unbroken overflow, such as a long URL, is allowed |
 | `MD047` | Files end with exactly one newline |
+
+`MD013` applies the same 80-character limit to headings, code blocks, and tables. Line lengths and
+columns count characters, and a tab counts as one character.
 
 ## Build
 

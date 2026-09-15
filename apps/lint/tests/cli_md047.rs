@@ -28,8 +28,12 @@ fn multiple_trailing_newlines_report_md047_and_exit_one() {
     let output = support::run_lint(&[file.to_str().unwrap()]);
 
     assert_eq!(output.status.code(), Some(1));
+    // Line 3 is also a second consecutive blank line, which MD012 reports at the same location,
+    // before MD047.
     let expected = format!(
-        "{}:3:1 MD047 more than one trailing newline\n",
+        "{}:3:1 MD012 multiple consecutive blank lines (expected at most 1, found 2)\n\
+         {}:3:1 MD047 more than one trailing newline\n",
+        file.display(),
         file.display()
     );
     assert_eq!(support::stdout(&output), expected);

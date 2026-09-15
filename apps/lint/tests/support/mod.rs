@@ -6,9 +6,11 @@
 //! so any one binary that does not call every helper here is expected, not dead code.
 #![allow(dead_code)]
 
+use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::process::Output;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::process::{Output, Stdio};
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 /// Runs the built `lint` binary with `args`, from the given working directory, and returns its
 /// captured output.
@@ -17,6 +19,52 @@ pub fn run_lint(args: &[&str]) -> Output {
         .args(args)
         .output()
         .expect("failed to execute the built lint binary")
+}
+
+/// Runs the built `lint` binary with `args` like [`run_lint`], but kills it and panics if it has
+/// not exited within `deadline`.
+///
+/// Stdout and stderr are drained on their own threads while the process runs. A child that writes
+/// more than a pipe buffer holds would otherwise block on the full pipe, and a wait that never
+/// reads the pipes would report that stall as a hang.
+pub fn run_lint_with_deadline(args: &[&str], deadline: Duration) -> Output {
+    let mut child = std::process::Command::new(env!("CARGO_BIN_EXE_lint"))
+        .args(args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("failed to spawn the built lint binary");
+
+    let stdout = drain(child.stdout.take().expect("stdout was not piped"));
+    let stderr = drain(child.stderr.take().expect("stderr was not piped"));
+
+    let give_up_at = Instant::now() + deadline;
+    let status = loop {
+        if let Some(status) = child.try_wait().expect("failed to poll the lint process") {
+            break status;
+        }
+        if Instant::now() >= give_up_at {
+            let _ = child.kill();
+            let _ = child.wait();
+            panic!("lint did not exit within {deadline:?}");
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    };
+
+    Output {
+        status,
+        stdout: stdout.join().expect("stdout reader thread panicked"),
+        stderr: stderr.join().expect("stderr reader thread panicked"),
+    }
+}
+
+fn drain(mut pipe: impl Read + Send + 'static) -> JoinHandle<Vec<u8>> {
+    std::thread::spawn(move || {
+        let mut bytes = Vec::new();
+        pipe.read_to_end(&mut bytes)
+            .expect("failed to read from the lint process");
+        bytes
+    })
 }
 
 /// Creates a fresh, empty temporary directory under the system temp directory, unique to this

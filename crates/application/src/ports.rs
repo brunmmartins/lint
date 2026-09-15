@@ -26,7 +26,8 @@ pub trait SourceReader {
 
 /// Parses Markdown source into a [`lint_domain::Document`].
 pub trait MarkdownParser {
-    /// Parses `source`. Infallible: `pulldown-cmark`, the parser behind this port, does not error
-    /// on malformed Markdown.
+    /// Parses `source` into its lines and the blocks the rules need, such as the line extents of
+    /// fenced and indented code blocks. Infallible: every source is some Markdown document, and
+    /// `pulldown-cmark`, the parser behind this port, does not error on malformed Markdown.
     fn parse(&self, source: &str) -> lint_domain::Document;
 }
