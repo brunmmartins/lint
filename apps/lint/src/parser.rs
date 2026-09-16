@@ -1,16 +1,16 @@
 use std::ops::Range;
 
 use lint_application::MarkdownParser;
-use lint_domain::{BlockKind, Document};
+use lint_domain::{BlockKind, Document, HeadingLevel};
 use pulldown_cmark::{CodeBlockKind, Event, Tag};
 
-/// Parses Markdown with `pulldown-cmark` and records where each fenced and indented code block
-/// starts and ends, so rules can tell code lines from other lines.
+/// Parses Markdown with `pulldown-cmark` and records where each code block, heading, HTML block,
+/// block quote, and list starts and ends, so rules can tell those lines apart.
 ///
 /// The parser runs with CommonMark defaults and no extensions. Its block parsing is
 /// non-recursive, so hostile input such as deeply nested block structure cannot overflow the stack
 /// here. Only block kinds and byte ranges leave this module; the [`Document`] turns them into line
-/// spans.
+/// spans, and decides what is nested from the spans themselves.
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PulldownMarkdownParser;
 
@@ -27,10 +27,28 @@ impl MarkdownParser for PulldownMarkdownParser {
                 Event::Start(Tag::CodeBlock(CodeBlockKind::Indented)) => {
                     Some((BlockKind::IndentedCode, range))
                 }
+                Event::Start(Tag::Heading { level, .. }) => {
+                    Some((BlockKind::Heading(heading_level(level)), range))
+                }
+                Event::Start(Tag::HtmlBlock) => Some((BlockKind::Html, range)),
+                Event::Start(Tag::BlockQuote(_)) => Some((BlockKind::BlockQuote, range)),
+                Event::Start(Tag::List(_)) => Some((BlockKind::List, range)),
                 _ => None,
             })
             .collect();
         Document::from_source_and_blocks(source, blocks)
+    }
+}
+
+/// Translates the parser's heading level into the domain's, so no parser type leaves this module.
+fn heading_level(level: pulldown_cmark::HeadingLevel) -> HeadingLevel {
+    match level {
+        pulldown_cmark::HeadingLevel::H1 => HeadingLevel::H1,
+        pulldown_cmark::HeadingLevel::H2 => HeadingLevel::H2,
+        pulldown_cmark::HeadingLevel::H3 => HeadingLevel::H3,
+        pulldown_cmark::HeadingLevel::H4 => HeadingLevel::H4,
+        pulldown_cmark::HeadingLevel::H5 => HeadingLevel::H5,
+        pulldown_cmark::HeadingLevel::H6 => HeadingLevel::H6,
     }
 }
 
@@ -107,7 +125,10 @@ mod tests {
     #[test]
     fn fence_in_list_item() {
         let source = "- item\n\n  ```\n  code\n  ```\n\nafter\n";
-        assert_eq!(spans(source), [(BlockKind::FencedCode, 3, 5)]);
+        assert_eq!(
+            spans(source),
+            [(BlockKind::List, 1, 6), (BlockKind::FencedCode, 3, 5)]
+        );
     }
 
     #[test]
@@ -118,6 +139,119 @@ mod tests {
 
     #[test]
     fn html_blocks_are_not_code() {
-        assert!(spans("<div>\n\n</div>\n").is_empty());
+        let blocks = spans("<div>\n\n</div>\n");
+        assert_eq!(blocks, [(BlockKind::Html, 1, 1), (BlockKind::Html, 3, 3)]);
+        assert!(blocks.iter().all(|&(kind, _, _)| !kind.is_code()));
+    }
+
+    #[test]
+    fn maps_atx_and_setext_heading_levels_and_spans() {
+        let source = "# one\n\n## two\n\n### three\n\n#### four\n\n##### five\n\n###### six\n";
+        assert_eq!(
+            spans(source),
+            [
+                (BlockKind::Heading(HeadingLevel::H1), 1, 1),
+                (BlockKind::Heading(HeadingLevel::H2), 3, 3),
+                (BlockKind::Heading(HeadingLevel::H3), 5, 5),
+                (BlockKind::Heading(HeadingLevel::H4), 7, 7),
+                (BlockKind::Heading(HeadingLevel::H5), 9, 9),
+                (BlockKind::Heading(HeadingLevel::H6), 11, 11),
+            ]
+        );
+
+        // Seven hashes are a paragraph, and four spaces of indent are code.
+        assert_eq!(
+            spans("####### seven\n\n    # indented\n"),
+            [(BlockKind::IndentedCode, 3, 3)]
+        );
+    }
+
+    #[test]
+    fn multi_line_setext_heading_spans_its_underline() {
+        assert_eq!(
+            spans("Title\n=====\n\nSub\n---\n"),
+            [
+                (BlockKind::Heading(HeadingLevel::H1), 1, 2),
+                (BlockKind::Heading(HeadingLevel::H2), 4, 5),
+            ]
+        );
+        assert_eq!(
+            spans("line a\nline b\n===\n"),
+            [(BlockKind::Heading(HeadingLevel::H1), 1, 3)]
+        );
+    }
+
+    #[test]
+    fn headings_nested_in_lists_and_block_quotes_are_mapped() {
+        let source = "# A\n\n- item\n\n  ### Nested\n\n> #### Quoted\n";
+        let blocks = spans(source);
+        assert!(
+            blocks.contains(&(BlockKind::Heading(HeadingLevel::H3), 5, 5)),
+            "{blocks:?}"
+        );
+        assert!(
+            blocks.contains(&(BlockKind::Heading(HeadingLevel::H4), 7, 7)),
+            "{blocks:?}"
+        );
+    }
+
+    #[test]
+    fn maps_html_blocks() {
+        assert_eq!(
+            spans("<div>\nstill html\n</div>\n\nafter\n"),
+            [(BlockKind::Html, 1, 3)]
+        );
+        // Two comment lines in a row are two blocks.
+        assert_eq!(
+            spans("<!-- a -->\n<!-- b -->\n"),
+            [(BlockKind::Html, 1, 1), (BlockKind::Html, 2, 2)]
+        );
+    }
+
+    #[test]
+    fn an_unclosed_comment_html_block_runs_to_the_last_line() {
+        assert_eq!(
+            spans("<!-- open\nstill\nstill\n"),
+            [(BlockKind::Html, 1, 3)]
+        );
+    }
+
+    #[test]
+    fn maps_block_quotes_and_lists() {
+        assert_eq!(spans("> quoted\n"), [(BlockKind::BlockQuote, 1, 1)]);
+        assert_eq!(spans("- a\n- b\n"), [(BlockKind::List, 1, 2)]);
+        assert_eq!(spans("10. a\n"), [(BlockKind::List, 1, 1)]);
+        assert_eq!(
+            spans("> a\n> > b\n"),
+            [(BlockKind::BlockQuote, 1, 2), (BlockKind::BlockQuote, 2, 2)]
+        );
+    }
+
+    #[test]
+    fn container_spans_end_before_a_following_top_level_heading() {
+        let shapes = [
+            "- a\n# H\n",
+            "- a\n\n# H\n",
+            "- a\nlazy\n# H\n",
+            "> a\n  # H\n",
+            "10. a\n   # H\n",
+            "- a\r\n\r\n# H\r\n",
+        ];
+        for source in shapes {
+            let blocks = spans(source);
+            let heading = blocks
+                .iter()
+                .find(|&&(kind, _, _)| kind.heading_level().is_some())
+                .copied();
+            let Some((_, heading_first, _)) = heading else {
+                panic!("no heading in {source:?}: {blocks:?}");
+            };
+            for &(kind, _, last) in &blocks {
+                assert!(
+                    !kind.is_container() || last < heading_first,
+                    "container reaches the heading in {source:?}: {blocks:?}"
+                );
+            }
+        }
     }
 }

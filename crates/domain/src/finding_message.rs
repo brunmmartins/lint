@@ -1,5 +1,7 @@
 use std::fmt;
 
+use crate::HeadingLevel;
+
 /// The message of a [`Finding`](crate::Finding), rendered through `Display`.
 ///
 /// The set of messages is closed and no variant carries text, so a message can never echo the
@@ -30,6 +32,21 @@ pub enum FindingMessage {
         /// How many characters the line has.
         found: usize,
     },
+    /// Renders as "heading level skipped (expected h{expected}, found h{found})".
+    HeadingLevelSkipped {
+        /// The deepest level this heading could have had without skipping one.
+        expected: HeadingLevel,
+        /// The level this heading has.
+        found: HeadingLevel,
+    },
+    /// Renders as "no space after hash on atx style heading".
+    MissingSpaceAfterHash,
+    /// Renders as "missing blank line above heading".
+    MissingBlankLineAboveHeading,
+    /// Renders as "missing blank line below heading".
+    MissingBlankLineBelowHeading,
+    /// Renders as "multiple top-level headings in the same document".
+    MultipleTopLevelHeadings,
 }
 
 impl fmt::Display for FindingMessage {
@@ -51,6 +68,24 @@ impl fmt::Display for FindingMessage {
                 f,
                 "line too long (expected at most {maximum} characters, found {found})"
             ),
+            FindingMessage::HeadingLevelSkipped { expected, found } => write!(
+                f,
+                "heading level skipped (expected h{}, found h{})",
+                expected.number(),
+                found.number()
+            ),
+            FindingMessage::MissingSpaceAfterHash => {
+                f.write_str("no space after hash on atx style heading")
+            }
+            FindingMessage::MissingBlankLineAboveHeading => {
+                f.write_str("missing blank line above heading")
+            }
+            FindingMessage::MissingBlankLineBelowHeading => {
+                f.write_str("missing blank line below heading")
+            }
+            FindingMessage::MultipleTopLevelHeadings => {
+                f.write_str("multiple top-level headings in the same document")
+            }
         }
     }
 }
@@ -85,6 +120,29 @@ mod tests {
                     found: 95,
                 },
                 "line too long (expected at most 80 characters, found 95)",
+            ),
+            (
+                FindingMessage::HeadingLevelSkipped {
+                    expected: HeadingLevel::H2,
+                    found: HeadingLevel::H4,
+                },
+                "heading level skipped (expected h2, found h4)",
+            ),
+            (
+                FindingMessage::MissingSpaceAfterHash,
+                "no space after hash on atx style heading",
+            ),
+            (
+                FindingMessage::MissingBlankLineAboveHeading,
+                "missing blank line above heading",
+            ),
+            (
+                FindingMessage::MissingBlankLineBelowHeading,
+                "missing blank line below heading",
+            ),
+            (
+                FindingMessage::MultipleTopLevelHeadings,
+                "multiple top-level headings in the same document",
             ),
         ];
 
