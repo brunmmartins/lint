@@ -38,14 +38,24 @@ cargo run -p lint -- README.md path/to/markdown
 Directories are searched recursively for files whose extension is `.md` or `.markdown`, without
 following directory symlinks. An explicitly named file is checked regardless of its extension.
 
-Findings are written to standard output in this form:
+An explicitly named path must be a regular file, or a symlink to one. Named pipes, devices, process
+substitutions such as `<(cmd)`, and `/dev/stdin` fed from a pipe are rejected without being read, with
+exit status `2`. Inside a walked directory, such entries are skipped. A file larger than 10 MiB is
+rejected.
+
+Findings are written to standard output in this form, each file's findings as soon as that file has
+been checked:
 
 ```text
 path/to/file.md:4:12 MD009 trailing whitespace
 ```
 
+Errors are written to standard error as they occur.
+
 The process exits with status `0` when no findings remain, `1` when findings are present, and `2` for
-invalid arguments or file-system errors.
+invalid arguments, file-system errors, or standard output that cannot be written. When standard output
+closes early, for example when piped into `head`, `lint` stops without checking the remaining paths
+and exits with status `2`.
 
 ## Development
 

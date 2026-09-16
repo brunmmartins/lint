@@ -8,7 +8,7 @@
 
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::process::{Output, Stdio};
+use std::process::{Child, ExitStatus, Output, Stdio};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
@@ -38,18 +38,7 @@ pub fn run_lint_with_deadline(args: &[&str], deadline: Duration) -> Output {
     let stdout = drain(child.stdout.take().expect("stdout was not piped"));
     let stderr = drain(child.stderr.take().expect("stderr was not piped"));
 
-    let give_up_at = Instant::now() + deadline;
-    let status = loop {
-        if let Some(status) = child.try_wait().expect("failed to poll the lint process") {
-            break status;
-        }
-        if Instant::now() >= give_up_at {
-            let _ = child.kill();
-            let _ = child.wait();
-            panic!("lint did not exit within {deadline:?}");
-        }
-        std::thread::sleep(Duration::from_millis(10));
-    };
+    let status = wait_with_deadline(&mut child, deadline);
 
     Output {
         status,
@@ -58,7 +47,28 @@ pub fn run_lint_with_deadline(args: &[&str], deadline: Duration) -> Output {
     }
 }
 
-fn drain(mut pipe: impl Read + Send + 'static) -> JoinHandle<Vec<u8>> {
+/// Waits for `child` to exit, polling without blocking. Kills it and panics if it has not exited
+/// within `deadline`.
+///
+/// This does not read the child's pipes: drain every piped stream with [`drain`] first, or a child
+/// that fills a pipe will stall and be reported as a hang.
+pub fn wait_with_deadline(child: &mut Child, deadline: Duration) -> ExitStatus {
+    let give_up_at = Instant::now() + deadline;
+    loop {
+        if let Some(status) = child.try_wait().expect("failed to poll the lint process") {
+            return status;
+        }
+        if Instant::now() >= give_up_at {
+            let _ = child.kill();
+            let _ = child.wait();
+            panic!("lint did not exit within {deadline:?}");
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+/// Reads `pipe` to its end on a thread of its own, and returns the bytes when joined.
+pub fn drain(mut pipe: impl Read + Send + 'static) -> JoinHandle<Vec<u8>> {
     std::thread::spawn(move || {
         let mut bytes = Vec::new();
         pipe.read_to_end(&mut bytes)

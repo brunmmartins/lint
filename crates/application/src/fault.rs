@@ -40,10 +40,31 @@ pub enum ReadFault {
         /// The offending path.
         path: PathBuf,
     },
+    /// The path is not a regular file, or a symlink to one: for example a named pipe, a device, or
+    /// a directory. It was not read.
+    NotRegularFile {
+        /// The offending path.
+        path: PathBuf,
+    },
 }
 
-/// The unified fault taxonomy the composition root reports on stderr and folds into the exit-code
-/// decision. Never a raw `io::Error`: ports translate at their own boundary.
+/// A failure to write results to the output (the [`Reporter`](crate::Reporter) port). Either
+/// variant stops the run.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ReportFault {
+    /// The output's reader has gone away, as when a pipe into `head` closes. Nothing more can be
+    /// delivered, and nothing needs explaining to a reader who has left.
+    Closed,
+    /// Any other failure to write or flush the output.
+    Unwritable {
+        /// The operating system's description of the failure (never file contents).
+        detail: String,
+    },
+}
+
+/// The unified fault taxonomy handed to [`Reporter::report_fault`](crate::Reporter::report_fault)
+/// and folded into the exit-code decision. Never a raw `io::Error`: ports translate at their own
+/// boundary.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LintFault {
     /// The path does not exist on disk.
@@ -70,6 +91,16 @@ pub enum LintFault {
         /// The offending path.
         path: PathBuf,
     },
+    /// The path is not a regular file, or a symlink to one. It was not read.
+    NotRegularFile {
+        /// The offending path.
+        path: PathBuf,
+    },
+    /// Standard output could not be written, so the run stopped.
+    OutputUnwritable {
+        /// The operating system's description of the failure (never file contents).
+        detail: String,
+    },
 }
 
 impl From<WalkFault> for LintFault {
@@ -87,6 +118,7 @@ impl From<ReadFault> for LintFault {
             ReadFault::Unreadable { path, detail } => LintFault::Unreadable { path, detail },
             ReadFault::TooLarge { path, limit_bytes } => LintFault::TooLarge { path, limit_bytes },
             ReadFault::InvalidUtf8 { path } => LintFault::InvalidUtf8 { path },
+            ReadFault::NotRegularFile { path } => LintFault::NotRegularFile { path },
         }
     }
 }
@@ -106,6 +138,12 @@ impl fmt::Display for LintFault {
                 path.display()
             ),
             LintFault::InvalidUtf8 { path } => write!(f, "{}: not valid UTF-8", path.display()),
+            LintFault::NotRegularFile { path } => {
+                write!(f, "{}: not a regular file", path.display())
+            }
+            LintFault::OutputUnwritable { detail } => {
+                write!(f, "standard output: cannot be written ({detail})")
+            }
         }
     }
 }
@@ -141,6 +179,38 @@ mod tests {
                 path: PathBuf::from("huge.md"),
                 limit_bytes: 10
             }
+        );
+    }
+
+    #[test]
+    fn read_fault_not_regular_file_converts_to_lint_fault() {
+        let fault = ReadFault::NotRegularFile {
+            path: PathBuf::from("pipe.md"),
+        };
+        assert_eq!(
+            LintFault::from(fault),
+            LintFault::NotRegularFile {
+                path: PathBuf::from("pipe.md")
+            }
+        );
+    }
+
+    #[test]
+    fn not_regular_file_names_the_path() {
+        let fault = LintFault::NotRegularFile {
+            path: PathBuf::from("docs/evil.md"),
+        };
+        assert_eq!(fault.to_string(), "docs/evil.md: not a regular file");
+    }
+
+    #[test]
+    fn output_unwritable_names_standard_output_and_the_reason() {
+        let fault = LintFault::OutputUnwritable {
+            detail: "No space left on device (os error 28)".to_string(),
+        };
+        assert_eq!(
+            fault.to_string(),
+            "standard output: cannot be written (No space left on device (os error 28))"
         );
     }
 

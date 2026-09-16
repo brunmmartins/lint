@@ -39,6 +39,8 @@ unused_must_use = "deny"
 
 [workspace.lints.clippy]
 dbg_macro = "deny"
+print_stderr = "deny"
+print_stdout = "deny"
 todo = "warn"
 unwrap_used = "warn"
 
