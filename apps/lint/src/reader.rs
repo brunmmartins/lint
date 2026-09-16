@@ -171,15 +171,35 @@ mod tests {
         );
     }
 
-    /// Counts the bytes pulled from the source it wraps.
+    /// Where an endless source below ends: twice one byte past the bound under test.
+    ///
+    /// A read that honours the bound stops at `MAX_FILE_BYTES + 1` and never reaches this, so the
+    /// ceiling cannot hide a read that pulls too much. A read that has lost its bound ends here
+    /// instead of running on, which keeps the cost of that failure a few tens of megabytes.
+    const ENDLESS_SOURCE_CEILING: u64 = 2 * (MAX_FILE_BYTES + 1);
+
+    /// Counts the bytes pulled from the source it wraps, and ends it at `ceiling` bytes.
+    ///
+    /// The ceiling is what makes the bound assertions below cheap to fail: an endless source with
+    /// no ceiling would let a regression in [`read_within_limit`] allocate until the test process
+    /// died, which reports nothing and takes the rest of the machine with it.
     struct CountingSource<S> {
         inner: S,
         pulled: u64,
+        ceiling: u64,
     }
 
     impl<S: Read> Read for CountingSource<S> {
         fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-            let count = self.inner.read(buf)?;
+            let remaining = self.ceiling.saturating_sub(self.pulled);
+            let allowed = usize::try_from(remaining)
+                .unwrap_or(usize::MAX)
+                .min(buf.len());
+            if allowed == 0 {
+                return Ok(0);
+            }
+
+            let count = self.inner.read(&mut buf[..allowed])?;
             self.pulled += u64::try_from(count).unwrap();
             Ok(count)
         }
@@ -191,6 +211,7 @@ mod tests {
         let mut source = CountingSource {
             inner: io::repeat(b'a'),
             pulled: 0,
+            ceiling: ENDLESS_SOURCE_CEILING,
         };
 
         let result = read_within_limit(&mut source, 0, MAX_FILE_BYTES).unwrap();
@@ -209,6 +230,7 @@ mod tests {
         let mut source = CountingSource {
             inner: io::repeat(b'a'),
             pulled: 0,
+            ceiling: ENDLESS_SOURCE_CEILING,
         };
 
         let result = read_within_limit(&mut source, 16, MAX_FILE_BYTES).unwrap();
